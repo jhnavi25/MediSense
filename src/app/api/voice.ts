@@ -4,13 +4,7 @@ export interface VoiceAnalysisResult {
   symptoms: string[];
   possibleConditions: string[];
   recommendations: string[];
-<<<<<<< HEAD
-  transcript?: string;
-  detectedLanguage?: string;
-  confidence?: number;
-=======
   transcribedText?: string;
->>>>>>> local-changes
 }
 
 const MOCK_RESULT: VoiceAnalysisResult = {
@@ -21,67 +15,15 @@ const MOCK_RESULT: VoiceAnalysisResult = {
     "Monitor temperature",
     "Consult a doctor if symptoms persist beyond 3 days",
   ],
-<<<<<<< HEAD
-  transcript: "I have been experiencing a severe headache for the past two days, along with fatigue and mild fever. I feel tired and have some body aches.",
-  detectedLanguage: "en",
-  confidence: 0.95,
-};
-
-// Enhanced mock results for different languages
-const MOCK_RESULTS_BY_LANG: Record<string, VoiceAnalysisResult> = {
-  en: {
-    symptoms: ["Headache", "Fatigue", "Mild fever"],
-    possibleConditions: ["Common Cold", "Stress-related headache", "Dehydration"],
-    recommendations: ["Rest and hydrate well", "Monitor temperature", "Consult doctor if persists"],
-    transcript: "I have been experiencing a severe headache for the past two days, along with fatigue and mild fever.",
-    detectedLanguage: "en",
-    confidence: 0.95,
-  },
-  es: {
-    symptoms: ["Dolor de cabeza", "Fiebre", "Cansancio"],
-    possibleConditions: ["Resfriado común", "Dolor de cabeza por estrés", "Deshidratación"],
-    recommendations: ["Descanse e hidrátese bien", "Monitoree la temperatura", "Consulte al médico si persiste"],
-    transcript: "He tenido un dolor de cabeza fuerte durante los últimos dos días, junto con cansancio y fiebre leve.",
-    detectedLanguage: "es",
-    confidence: 0.92,
-  },
-  fr: {
-    symptoms: ["Mal de tête", "Fatigue", "Fièvre légère"],
-    possibleConditions: ["Rhume", "Mal de tête lié au stress", "Déshydratation"],
-    recommendations: ["Reposez-vous et hydratez-vous bien", "Surveillez la température", "Consultez un médecin si ça persiste"],
-    transcript: "J'ai eu un mal de tête sévère depuis deux jours, avec de la fatigue et une légère fièvre.",
-    detectedLanguage: "fr",
-    confidence: 0.90,
-  },
-};
-
-export async function analyzeVoice(audioBlob: Blob, language?: string): Promise<VoiceAnalysisResult> {
-  if (!isBackendConfigured()) {
-    // Return mock result based on language or default to English
-    if (language && MOCK_RESULTS_BY_LANG[language]) {
-      return MOCK_RESULTS_BY_LANG[language];
-    }
-    return MOCK_RESULT;
-  }
-  
-  const token = typeof window !== "undefined" ? localStorage.getItem("medisense_token") : null;
-  const formData = new FormData();
-  formData.append("audio", audioBlob, "recording.webm");
-  if (language) {
-    formData.append("language", language);
-  }
-=======
 };
 
 // Note: Transcription is handled in real-time in VoiceAnalyzerPage using Web Speech API
 // This function accepts the transcript directly from the component
 
 export async function analyzeVoice(audioBlob: Blob, language: string = "en-US", transcript?: string): Promise<VoiceAnalysisResult> {
-  // Use provided transcript (captured in real-time from VoiceAnalyzerPage using Web Speech API)
   const finalTranscript = transcript || "";
   
   if (!isBackendConfigured()) {
-    // If no backend, analyze locally
     if (finalTranscript) {
       return {
         ...MOCK_RESULT,
@@ -100,11 +42,9 @@ export async function analyzeVoice(audioBlob: Blob, language: string = "en-US", 
 
   const token = typeof window !== "undefined" ? localStorage.getItem("medisense_token") : null;
   
-  // Send transcript to server for analysis
   const formData = new FormData();
   formData.append("transcript", finalTranscript);
   formData.append("language", language);
->>>>>>> local-changes
   
   const url = getBaseUrl() + "/api/voice/analyze";
   const res = await fetch(url, {
@@ -114,9 +54,6 @@ export async function analyzeVoice(audioBlob: Blob, language: string = "en-US", 
   });
   
   if (!res.ok) throw new Error("Analysis failed");
-<<<<<<< HEAD
-  return res.json();
-=======
   const result = await res.json();
   return { ...result, transcribedText: finalTranscript };
 }
@@ -458,18 +395,13 @@ function generateRecommendations(symptoms: string[]): string[] {
   recommendations.push("Maintain good hygiene practices to prevent spreading infections");
 
   return recommendations.slice(0, 8);
->>>>>>> local-changes
 }
 
 export async function saveVoiceToDashboard(analysisId: string): Promise<{ success: boolean }> {
   if (!isBackendConfigured()) return Promise.resolve({ success: true });
-<<<<<<< HEAD
-  return request<{ success: boolean }>("/api/voice/save", { 
-    method: "POST", 
+  return request<{ success: boolean }>("/api/voice/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ analysisId }),
-    headers: { 'Content-Type': 'application/json' }
   });
-=======
-  return request("/api/voice/save", { method: "POST", body: JSON.stringify({ analysisId }) });
->>>>>>> local-changes
 }
